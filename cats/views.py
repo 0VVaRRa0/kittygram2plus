@@ -1,4 +1,5 @@
-from rest_framework import throttling, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, throttling, viewsets
 
 from .models import Achievement, Cat, User
 from .pagination import CatsPagination
@@ -15,6 +16,11 @@ class CatViewSet(viewsets.ModelViewSet):
         WorkingHoursRateThrottle, throttling.ScopedRateThrottle)
     throttle_scope = 'low_request'
     pagination_class = CatsPagination
+    filter_backends = (
+        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filterset_fields = ('color', 'birth_year')
+    search_fields = ('name',)
+    ordering_fields = ('name', 'birth_year')
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
